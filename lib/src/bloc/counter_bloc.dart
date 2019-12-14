@@ -1,26 +1,27 @@
-
-
 import 'dart:async';
+import 'package:bloc/bloc.dart';
+import './bloc.dart';
 
-class CounterBloc {
+class CounterBloc extends Bloc<CounterEvent, CounterState> {
   int count = 0;
 
-  final _countController = StreamController<int>.broadcast();
+  @override
+  CounterState get initialState => InitialCounterState(count);
 
-  get counterStream => _countController.stream;
-
-  get addCurrentCounter => _countController.sink.add(count);
-
-  plusOrMinusCounter(int val){
-    count += val;
-
-    _countController.sink.add(count);
+  @override
+  Stream<CounterState> mapEventToState(
+    CounterEvent event,
+  ) async* {
+    // TODO: Add Logic
+    yield Counting();
+    if(event is AddCount){
+      count++;
+      yield Counted(count);
+    } else if(event is MinusCount){
+      count--;
+      yield Counted(count);
+    } else if(event is GetCount){
+      yield Counted(count);
+    }
   }
-
-  dispose(){
-    _countController.close();
-  }
-
 }
-
-var counterBloc = CounterBloc();
